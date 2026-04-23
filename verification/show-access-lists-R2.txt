@@ -1,0 +1,30 @@
+! ============================================================
+! Router: R2
+! Command: show access-lists
+! Captured after running all six connectivity tests
+! ============================================================
+
+R2# show access-lists
+
+Standard IP access list 1
+  10 deny   192.168.11.0 0.0.0.255   (4 match(es))
+  20 permit any                       (8 match(es))
+
+! ----------------------------------------------------------
+! Analysis:
+!
+! Statement 10 — 4 matches
+!   PC2 (192.168.11.10) pinged WebServer 4 times
+!   All 4 ICMP packets matched the deny rule → blocked
+!
+! Statement 20 — 8 matches
+!   PC1 → WebServer (4 packets) — permitted
+!   PC3 → WebServer (4 packets) — permitted
+!   Total: 8 packets hit the permit any → forwarded
+!
+! Match counters confirm:
+!   - Deny rule is actively enforcing the policy
+!   - Permit rule is forwarding all other allowed traffic
+!   - No misconfiguration (zero matches on either rule would
+!     indicate an application or direction error)
+! ============================================================
