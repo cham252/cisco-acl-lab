@@ -1,0 +1,29 @@
+! ============================================================
+! Router: R3
+! Command: show access-lists
+! Captured after running all six connectivity tests
+! ============================================================
+
+R3# show access-lists
+
+Standard IP access list 1
+  10 deny   192.168.10.0 0.0.0.255   (4 match(es))
+  20 permit any                       (8 match(es))
+
+! ----------------------------------------------------------
+! Analysis:
+!
+! Statement 10 — 4 matches
+!   PC1 (192.168.10.10) pinged PC3 4 times
+!   All 4 ICMP packets matched the deny rule → blocked
+!
+! Statement 20 — 8 matches
+!   PC2 → PC3 (4 packets) — permitted
+!   PC3 → WebServer (4 packets) — traffic does not cross R3 G0/0
+!   outbound in this direction; count reflects other permitted flows
+!
+! Match counters confirm:
+!   - Deny rule is actively enforcing PC1 isolation from PC3
+!   - Permit rule is forwarding all other allowed traffic
+!   - Symmetric match counts (4 deny, 8 permit) mirror R2 results
+! ============================================================
