@@ -1,0 +1,43 @@
+! ============================================================
+! Router: R2
+! Lab: GLAB-125.4.2 — Configure Numbered Standard IPv4 ACLs
+! Policy: Block 192.168.11.0/24 (PC2) from WebServer
+! Interface: GigabitEthernet0/0 (faces 192.168.20.0/24)
+! ============================================================
+
+R2> enable
+R2# configure terminal
+
+! ----------------------------------------------------------
+! Step 1: Create ACL 1
+! Deny source network 192.168.11.0/24
+! Wildcard 0.0.0.255 = match any host in .11.0 network
+! ----------------------------------------------------------
+R2(config)# access-list 1 deny 192.168.11.0 0.0.0.255
+
+! ----------------------------------------------------------
+! Step 2: Permit all other traffic
+! Without this, implicit deny-all drops everything else
+! ----------------------------------------------------------
+R2(config)# access-list 1 permit any
+
+! ----------------------------------------------------------
+! Step 3: Verify ACL before applying
+! Confirm statements are correct before binding to interface
+! ----------------------------------------------------------
+R2# show access-lists
+
+! Expected output:
+! Standard IP access list 1
+!   10 deny   192.168.11.0 0.0.0.255
+!   20 permit any
+
+! ----------------------------------------------------------
+! Step 4: Apply ACL outbound on G0/0
+! "out" = filters traffic LEAVING toward the WebServer LAN
+! Placement closest to destination per standard ACL best practice
+! ----------------------------------------------------------
+R2(config)# interface GigabitEthernet0/0
+R2(config-if)# ip access-group 1 out
+R2(config-if)# end
+R2# write memory
